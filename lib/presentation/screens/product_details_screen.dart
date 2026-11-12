@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants/api_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/product_model.dart';
 import '../../data/providers/cart_provider.dart';
@@ -31,7 +32,6 @@ class ProductDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ১. প্রোডাক্ট ইমেজ
             Container(
               color: Colors.white,
               width: double.infinity,
@@ -45,8 +45,6 @@ class ProductDetailsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // ২. প্রাইসিং এবং অফার সেকশন
             Container(
               color: Colors.white,
               padding: const EdgeInsets.all(16),
@@ -109,8 +107,6 @@ class ProductDetailsScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // ৩. শিপিং এবং ট্রাস্ট ব্যাজ (Amazon/Daraz Style)
             Container(
               color: Colors.white,
               padding: const EdgeInsets.all(16),
@@ -143,8 +139,6 @@ class ProductDetailsScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // ৪. বিবরণ
             Container(
               color: Colors.white,
               width: double.infinity,
@@ -168,8 +162,6 @@ class ProductDetailsScreen extends StatelessWidget {
           ],
         ),
       ),
-
-      // ৫. স্টিকি বটম অ্যাকশন বার (Add to Cart & Buy Now)
       bottomSheet: Container(
         height: 70,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -215,8 +207,8 @@ class ProductDetailsScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CheckoutWebviewScreen(
-                        checkoutUrl: "https://cjdropshipping.com/product-detail/${product.id}.html",
+                      builder: (context) => const CheckoutWebviewScreen(
+                        checkoutUrl: ApiConstants.wed2cStoreUrl,
                       ),
                     ),
                   );
