@@ -5,6 +5,9 @@ class ApiConstants {
   // CJ API 2.0 Base URL
   static const String baseUrl = "https://developers.cjdropshipping.com/api2.0/v1";
 
+  // Official Branded Retail Store URL
+  static const String wed2cStoreUrl = "https://primemarket.wed2c.com";
+
   // Endpoints
   static const String getAccessTokenUrl = "$baseUrl/authentication/getAccessToken";
   static const String productListUrl = "$baseUrl/product/list";
