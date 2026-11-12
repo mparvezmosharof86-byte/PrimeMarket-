@@ -8,7 +8,7 @@ class CjApiService {
   String? _accessToken;
   DateTime? _tokenExpiry;
 
-  // ১. স্বয়ংক্রিয় এক্সেস টোকেন জেনারেটর
+  // ১. এক্সেস টোকেন জেনারেটর
   Future<String?> getValidAccessToken() async {
     if (_accessToken != null && _tokenExpiry != null && DateTime.now().isBefore(_tokenExpiry!)) {
       return _accessToken;
@@ -26,18 +26,16 @@ class CjApiService {
         if (data['result'] == true && data['data'] != null) {
           _accessToken = data['data']['accessToken'];
           _tokenExpiry = DateTime.now().add(const Duration(days: 14));
-          debugPrint("✅ CJ API Token Obtained Successfully!");
           return _accessToken;
         }
       }
-      debugPrint("❌ Failed to obtain token: ${response.body}");
     } catch (e) {
       debugPrint("❌ CJ Auth Error: $e");
     }
     return null;
   }
 
-  // ২. ট্রেন্ডিং ও ক্যাটাগরি প্রোডাক্ট ফেচিং
+  // ২. ট্রেন্ডিং প্রোডাক্টস
   Future<List<ProductModel>> getTrendingProducts({int page = 1, int size = 20}) async {
     final token = await getValidAccessToken();
     if (token == null) return [];
@@ -61,6 +59,34 @@ class CjApiService {
       }
     } catch (e) {
       debugPrint("❌ Product Fetch Error: $e");
+    }
+    return [];
+  }
+
+  // ৩. প্রোডাক্ট সার্চ মেথড
+  Future<List<ProductModel>> searchProducts(String keyword, {int page = 1, int size = 20}) async {
+    final token = await getValidAccessToken();
+    if (token == null) return [];
+
+    try {
+      final url = Uri.parse("${ApiConstants.productListUrl}?productNameEn=$keyword&pageNum=$page&pageSize=$size");
+      final response = await http.get(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "CJ-Access-Token": token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['result'] == true && body['data'] != null && body['data']['list'] != null) {
+          final List list = body['data']['list'];
+          return list.map((item) => ProductModel.fromCJJson(item)).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint("❌ Search Error: $e");
     }
     return [];
   }
