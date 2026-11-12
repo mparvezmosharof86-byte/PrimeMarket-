@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../core/constants/api_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/providers/cart_provider.dart';
 import 'checkout_webview_screen.dart';
@@ -122,8 +123,6 @@ class CartScreen extends StatelessWidget {
                     },
                   ),
                 ),
-
-                // বটম সামারি ও চেকআউট বাটন
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -156,12 +155,11 @@ class CartScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                             onPressed: () {
-                              final firstItem = cart.items.first;
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => CheckoutWebviewScreen(
-                                    checkoutUrl: "https://cjdropshipping.com/product-detail/${firstItem.product.id}.html",
+                                  builder: (context) => const CheckoutWebviewScreen(
+                                    checkoutUrl: ApiConstants.wed2cStoreUrl,
                                   ),
                                 ),
                               );
