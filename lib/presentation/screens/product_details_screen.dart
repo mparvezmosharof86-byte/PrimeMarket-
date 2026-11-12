@@ -159,7 +159,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     product.description.isEmpty
                         ? "Premium grade product with imported factory manufacturing. Optimized for daily usage with durable quality and guaranteed warranty directly backed by PrimeMarket Global Hub."
                         : product.description,
-                    style: const TextStyle(fontSize: 13, color: Colors.black89, height: 1.4),
+                    style: const TextStyle(fontSize: 13, color: Colors.black87, height: 1.4),
                   ),
                 ],
               ),
