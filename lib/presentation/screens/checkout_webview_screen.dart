@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/theme/app_theme.dart';
+import 'order_success_screen.dart';
 
 class CheckoutWebviewScreen extends StatefulWidget {
   final String checkoutUrl;
@@ -9,7 +10,7 @@ class CheckoutWebviewScreen extends StatefulWidget {
   const CheckoutWebviewScreen({
     super.key,
     required this.checkoutUrl,
-    this.title = "PrimeMarket Secure Checkout",
+    this.title = "PrimeMarket Official Checkout",
   });
 
   @override
@@ -29,6 +30,17 @@ class _CheckoutWebviewScreenState extends State<CheckoutWebviewScreen> {
         NavigationDelegate(
           onPageStarted: (String url) {
             setState(() => _isLoading = true);
+            // পেমেন্ট সফল হওয়ার সাথে সাথে অটোমেটিক লাইভ ট্র্যাকিং স্ক্রিনে শিফট করবে
+            if (url.contains('success') ||
+                url.contains('order-detail') ||
+                url.contains('thank-you') ||
+                url.contains('orderSuccess') ||
+                url.contains('pay-success')) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => OrderSuccessScreen()),
+              );
+            }
           },
           onPageFinished: (String url) {
             setState(() => _isLoading = false);
