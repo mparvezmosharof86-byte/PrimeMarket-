@@ -22,7 +22,6 @@ class OrderSuccessScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // ১. সাকসেস হেডার ব্যাজ
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -66,10 +65,7 @@ class OrderSuccessScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // ২. দারাজ/আমাজন স্টাইল লাইভ ট্র্যাকিং টাইমলাইন (Live Stepper)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -87,48 +83,36 @@ class OrderSuccessScreen extends StatelessWidget {
                     children: [
                       Icon(Icons.local_shipping, color: AppTheme.primary, size: 22),
                       SizedBox(width: 8),
-                      Text(
-                        "Live Shipment Tracking",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
+                      Text("Live Shipment Tracking", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    "Standard Global Air Delivery (7 - 12 Business Days)",
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
+                  Text("Standard Global Air Delivery (7 - 12 Business Days)", style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                   const Divider(height: 28),
-
-                  // স্টেপ ১: অর্ডার কনফার্মড
                   _buildTrackingStep(
                     title: "Order Confirmed & Paid",
                     subtitle: "Payment received via Secure Gateway",
                     isCompleted: true,
                     isCurrent: false,
                   ),
-                  // স্টেপ ২: চায়না ওয়্যারহাউজ প্রসেসিং
                   _buildTrackingStep(
                     title: "Processing at Global Hub (China)",
                     subtitle: "Supplier packaging and inspection in progress",
                     isCompleted: true,
                     isCurrent: true,
                   ),
-                  // স্টেপ ৩: বিমানে শিপমেন্ট
                   _buildTrackingStep(
                     title: "Dispatched via Air Cargo",
                     subtitle: "Handed over to international air logistics",
                     isCompleted: false,
                     isCurrent: false,
                   ),
-                  // স্টেপ ৪: কাস্টমস ক্লিয়ারেন্স
                   _buildTrackingStep(
                     title: "Customs Clearance",
                     subtitle: "Arrived at destination country port",
                     isCompleted: false,
                     isCurrent: false,
                   ),
-                  // স্টেপ ৫: কুরিয়ার ডেলিভারি
                   _buildTrackingStep(
                     title: "Out for Delivery",
                     subtitle: "Local courier heading to your doorstep",
@@ -139,10 +123,7 @@ class OrderSuccessScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // ৩. বাটন
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -158,10 +139,7 @@ class OrderSuccessScreen extends StatelessWidget {
                     (route) => false,
                   );
                 },
-                child: const Text(
-                  "Continue Shopping",
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: const Text("Continue Shopping", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -228,3 +206,4 @@ class OrderSuccessScreen extends StatelessWidget {
       ],
     );
   }
+}
