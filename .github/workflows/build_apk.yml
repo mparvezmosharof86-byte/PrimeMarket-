@@ -31,6 +31,11 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Auto-generate Android Platform & v2 Embedding
+        run: |
+          flutter create . --org com.novastudio24 --project-name primemarket --platforms android
+          sed -i -e 's/gradle-[0-9.]*-all.zip/gradle-8.4-all.zip/' android/gradle/wrapper/gradle-wrapper.properties || true
+
       - name: Get Dependencies
         run: flutter pub get
 
@@ -47,7 +52,7 @@ jobs:
         with:
           tag_name: "v1.0.${{ github.run_number }}"
           name: "PrimeMarket Build #${{ github.run_number }}"
-          body: "📲 **Direct APK Download (No ZIP Needed)**\n\nClick on PrimeMarket.apk below to download directly to your phone."
+          body: "📲 **Direct APK Download (No ZIP)**\n\nClick on PrimeMarket.apk below to download directly to your mobile phone."
           files: build/app/outputs/flutter-apk/PrimeMarket.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
