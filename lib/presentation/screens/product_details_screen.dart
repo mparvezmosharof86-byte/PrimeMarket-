@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/api_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/product_model.dart';
 import '../../data/providers/cart_provider.dart';
-import 'checkout_webview_screen.dart';
+import 'native_checkout_screen.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   final ProductModel product;
@@ -204,12 +203,11 @@ class ProductDetailsScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 onPressed: () {
+                  // সরাসরি ১০০% নেটিভ চেকআউট পেজ ওপেন হবে
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const CheckoutWebviewScreen(
-                        checkoutUrl: ApiConstants.wed2cStoreUrl,
-                      ),
+                      builder: (context) => NativeCheckoutScreen(product: product),
                     ),
                   );
                 },
