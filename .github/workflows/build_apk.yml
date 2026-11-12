@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,17 +31,23 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Auto-generate Android Platform & v2 Embedding
-        run: flutter create . --org com.novastudio24 --project-name primemarket --platforms android
-
       - name: Get Dependencies
         run: flutter pub get
 
       - name: Build Release APK
         run: flutter build apk --release
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - name: Prepare Direct APK
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/PrimeMarket.apk
+
+      - name: Publish Direct APK (No ZIP)
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
         with:
-          name: PrimeMarket-Release-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          tag_name: "v1.0.${{ github.run_number }}"
+          name: "PrimeMarket Build #${{ github.run_number }}"
+          body: "📲 **Direct APK Download (No ZIP Needed)**\n\nClick on PrimeMarket.apk below to download directly to your phone."
+          files: build/app/outputs/flutter-apk/PrimeMarket.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
