@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../core/constants/api_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/providers/cart_provider.dart';
-import 'checkout_webview_screen.dart';
+import 'native_checkout_screen.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -155,12 +154,11 @@ class CartScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                             onPressed: () {
+                              // কার্টের সব আইটেম নিয়ে সরাসরি নেটিভ চেকআউটে প্রবেশ
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const CheckoutWebviewScreen(
-                                    checkoutUrl: ApiConstants.wed2cStoreUrl,
-                                  ),
+                                  builder: (context) => const NativeCheckoutScreen(),
                                 ),
                               );
                             },
