@@ -1,4 +1,4 @@
-class ApiConstants {
+lclass ApiConstants {
   // CJ Dropshipping API Credentials
   static const String cjApiKey = "CJ6047878@api@fb0e9a894e54406eb844fd63efc4efec";
   
@@ -11,9 +11,9 @@ class ApiConstants {
   // ==========================================================
   static const bool isStripeLive = false;
 
-  // Test (Sandbox) Keys — আপনার Stripe ড্যাশবোর্ড থেকে নিয়ে এখানে বসান:
-  static const String _stripeTestPublishableKey = "pk_test_আপনার_পাবলিশেবল_কি_এখানে_বসান";
-  static const String _stripeTestSecretKey = "sk_test_আপনার_সিক্রেট_কি_এখানে_বসান";
+  // আপনার দেওয়া আসল Test (Sandbox) Keys:
+  static const String _stripeTestPublishableKey = "pk_test_51UagPFFHBvHsFU6kZuSe8P86tXHqV4bz75lqEoFus7mpmmftUcfZZLGB2lwXasOHHbO4oLxbaMA7BnFPXtM9j6xH00Y8Y7haF0";
+  static const String _stripeTestSecretKey = "sk_test_51UagPFFHBvHsFU6kUplwdRfl8ONTGy1Gp8Rjlhbm2uq9Xm9CZkRTwVFEg5UlTXjKIzICcRIeA18J2I5qMqtafn7H00HsO5shzS";
 
   // Live Keys — ভবিষ্যতে লাইভ হলে বসাবেন:
   static const String _stripeLivePublishableKey = "pk_live_আপনার_লাইভ_কি";
