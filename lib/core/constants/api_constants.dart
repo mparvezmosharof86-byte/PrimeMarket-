@@ -5,8 +5,26 @@ class ApiConstants {
   // CJ API 2.0 Base URL
   static const String baseUrl = "https://developers.cjdropshipping.com/api2.0/v1";
 
-  // Official Branded Retail Store URL
-  static const String wed2cStoreUrl = "https://primemarket.wed2c.com";
+  // ==========================================================
+  // STRIPE PERMANENT ONE-SWITCH CONFIGURATION
+  // ভবিষ্যতে লাইভ হলে শুধু false কে true করে দেবেন
+  // ==========================================================
+  static const bool isStripeLive = false;
+
+  // Test (Sandbox) Keys — আপনার Stripe ড্যাশবোর্ড থেকে নিয়ে এখানে বসান:
+  static const String _stripeTestPublishableKey = "pk_test_আপনার_পাবলিশেবল_কি_এখানে_বসান";
+  static const String _stripeTestSecretKey = "sk_test_আপনার_সিক্রেট_কি_এখানে_বসান";
+
+  // Live Keys — ভবিষ্যতে লাইভ হলে বসাবেন:
+  static const String _stripeLivePublishableKey = "pk_live_আপনার_লাইভ_কি";
+  static const String _stripeLiveSecretKey = "sk_live_আপনার_লাইভ_সিক্রেট_কি";
+
+  // Auto-Switch Getters (অ্যাপের আর কোথাও হাত দিতে হবে না)
+  static String get activeStripePublishableKey =>
+      isStripeLive ? _stripeLivePublishableKey : _stripeTestPublishableKey;
+
+  static String get activeStripeSecretKey =>
+      isStripeLive ? _stripeLiveSecretKey : _stripeTestSecretKey;
 
   // Endpoints
   static const String getAccessTokenUrl = "$baseUrl/authentication/getAccessToken";
