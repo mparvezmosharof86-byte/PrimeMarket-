@@ -33,6 +33,11 @@ jobs:
         run: |
           flutter create . --org com.novastudio24 --project-name primemarket --platforms android
           rm -f android/build.gradle.kts android/settings.gradle.kts android/app/build.gradle.kts
+          echo 'allprojects { repositories { google(); mavenCentral() } }' > android/build.gradle
+          echo 'rootProject.buildDir = "../build"' >> android/build.gradle
+          echo 'subprojects { project.buildDir = "${rootProject.buildDir}/${project.name}" }' >> android/build.gradle
+          echo 'subprojects { project.evaluationDependsOn(":app") }' >> android/build.gradle
+          echo 'tasks.register("clean", Delete) { delete rootProject.buildDir }' >> android/build.gradle
           echo "distributionBase=GRADLE_USER_HOME" > android/gradle/wrapper/gradle-wrapper.properties
           echo "distributionPath=wrapper/dists" >> android/gradle/wrapper/gradle-wrapper.properties
           echo "zipStoreBase=GRADLE_USER_HOME" >> android/gradle/wrapper/gradle-wrapper.properties
