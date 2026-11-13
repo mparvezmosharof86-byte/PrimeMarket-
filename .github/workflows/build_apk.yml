@@ -22,15 +22,17 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup Latest Flutter
+      - name: Setup Flutter 3.29.3
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.29.3'
           channel: 'stable'
           cache: true
 
       - name: Sync Android Wrapper & Gradle 8.11.1
         run: |
           flutter create . --org com.novastudio24 --project-name primemarket --platforms android
+          rm -f android/build.gradle.kts android/settings.gradle.kts android/app/build.gradle.kts
           echo "distributionBase=GRADLE_USER_HOME" > android/gradle/wrapper/gradle-wrapper.properties
           echo "distributionPath=wrapper/dists" >> android/gradle/wrapper/gradle-wrapper.properties
           echo "zipStoreBase=GRADLE_USER_HOME" >> android/gradle/wrapper/gradle-wrapper.properties
