@@ -4,10 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/product_model.dart';
 import '../../data/providers/cart_provider.dart';
+import '../../data/services/stripe_payment_service.dart';
 import 'order_success_screen.dart';
 
 class NativeCheckoutScreen extends StatefulWidget {
-  final ProductModel? product; // যদি সিঙ্গেল আইটেম "Buy Now" থেকে আসে
+  final ProductModel? product;
 
   const NativeCheckoutScreen({super.key, this.product});
 
@@ -18,17 +19,10 @@ class NativeCheckoutScreen extends StatefulWidget {
 class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Shipping Controllers
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
-
-  // Card Payment Controllers
-  final _cardNumberController = TextEditingController();
-  final _expiryController = TextEditingController();
-  final _cvvController = TextEditingController();
-  final _cardHolderController = TextEditingController();
 
   bool _isProcessing = false;
 
@@ -38,10 +32,6 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
     _phoneController.dispose();
     _addressController.dispose();
     _cityController.dispose();
-    _cardNumberController.dispose();
-    _expiryController.dispose();
-    _cvvController.dispose();
-    _cardHolderController.dispose();
     super.dispose();
   }
 
@@ -50,23 +40,31 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
 
     setState(() => _isProcessing = true);
 
-    // সিকিউর ট্রানজ্যাকশন সিমুলেশন (৩ সেকেন্ড)
-    await Future.delayed(const Duration(seconds: 3));
+    // আসল Stripe Native PaymentSheet কল করা
+    final bool isPaid = await StripePaymentService.makePayment(
+      amountUsd: totalAmount,
+      customerName: _nameController.text.trim(),
+    );
 
     if (!mounted) return;
-
-    // কার্ট থেকে আসলে কার্ট ক্লিয়ার করে দেওয়া
-    if (widget.product == null) {
-      Provider.of<CartProvider>(context, listen: false).clearCart();
-    }
-
     setState(() => _isProcessing = false);
 
-    // সরাসরি লাইভ ট্র্যাকিং সাকসেস স্ক্রিনে শিফট
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => OrderSuccessScreen()),
-    );
+    if (isPaid) {
+      if (widget.product == null) {
+        Provider.of<CartProvider>(context, listen: false).clearCart();
+      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => OrderSuccessScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Payment Cancelled or Invalid API Keys! Check Stripe Keys."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -77,7 +75,7 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
     final double subtotal = isSingleProduct
         ? widget.product!.finalSellingPriceUsd
         : cart.subtotal;
-    const double shipping = 0.00; // ফ্রি গ্লোবাল ডেলিভারি
+    const double shipping = 0.00;
     final double total = subtotal + shipping;
 
     return Scaffold(
@@ -87,15 +85,13 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
         backgroundColor: AppTheme.navyHeader,
       ),
       body: _isProcessing
-          ? Center(
+          ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircularProgressIndicator(color: AppTheme.primary),
-                  const SizedBox(height: 20),
-                  const Text("Securing Payment via Encrypted Gateway...", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 6),
-                  Text("Communicating with Global Air Warehouse", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                  CircularProgressIndicator(color: AppTheme.primary),
+                  SizedBox(height: 16),
+                  Text("Opening Secure Stripe Gateway...", style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             )
@@ -125,16 +121,10 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
                             validator: (val) => val == null || val.isEmpty ? "Required" : null,
                           ),
                           const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _cityController,
-                                  decoration: const InputDecoration(labelText: "City / District", prefixIcon: Icon(Icons.location_city)),
-                                  validator: (val) => val == null || val.isEmpty ? "Required" : null,
-                                ),
-                              ),
-                            ],
+                          TextFormField(
+                            controller: _cityController,
+                            decoration: const InputDecoration(labelText: "City / District", prefixIcon: Icon(Icons.location_city)),
+                            validator: (val) => val == null || val.isEmpty ? "Required" : null,
                           ),
                           const SizedBox(height: 10),
                           TextFormField(
@@ -163,79 +153,19 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
 
                     const SizedBox(height: 14),
 
-                    // ৩. কার্ড পেমেন্ট সেকশন (Visa, Mastercard, Amex)
+                    // ৩. পেমেন্ট মেথড ট্রাস্ট ব্যাজ
                     _buildSectionContainer(
-                      title: "Payment Method (Card)",
-                      icon: Icons.credit_card,
-                      trailing: Row(
+                      title: "Payment Method (Powered by Stripe)",
+                      icon: Icons.lock_outline,
+                      child: Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(color: const Color(0xFF1A1F71), borderRadius: BorderRadius.circular(3)),
-                            child: const Text("VISA", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
-                          ),
-                          const SizedBox(width: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(color: const Color(0xFFEB001B), borderRadius: BorderRadius.circular(3)),
-                            child: const Text("MC", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextFormField(
-                            controller: _cardNumberController,
-                            keyboardType: TextInputType.number,
-                            maxLength: 19,
-                            decoration: const InputDecoration(
-                              labelText: "Card Number",
-                              hintText: "4242 •••• •••• 4242",
-                              prefixIcon: Icon(Icons.payment),
-                              counterText: "",
-                            ),
-                            validator: (val) => val == null || val.length < 15 ? "Valid Card Required" : null,
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _expiryController,
-                                  keyboardType: TextInputType.datetime,
-                                  maxLength: 5,
-                                  decoration: const InputDecoration(labelText: "MM/YY", hintText: "12/28", counterText: ""),
-                                  validator: (val) => val == null || !val.contains("/") ? "MM/YY" : null,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _cvvController,
-                                  keyboardType: TextInputType.number,
-                                  maxLength: 4,
-                                  obscureText: true,
-                                  decoration: const InputDecoration(labelText: "CVV", hintText: "•••", counterText: ""),
-                                  validator: (val) => val == null || val.length < 3 ? "CVV" : null,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          TextFormField(
-                            controller: _cardHolderController,
-                            decoration: const InputDecoration(labelText: "Cardholder Name", prefixIcon: Icon(Icons.badge_outlined)),
-                            validator: (val) => val == null || val.isEmpty ? "Required" : null,
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(Icons.lock_outline, size: 14, color: Colors.green),
-                              const SizedBox(width: 6),
-                              Text("256-Bit SSL Encryption Guaranteed", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
-                            ],
-                          ),
+                          _buildBadge("VISA", const Color(0xFF1A1F71)),
+                          const SizedBox(width: 8),
+                          _buildBadge("Mastercard", const Color(0xFFEB001B)),
+                          const SizedBox(width: 8),
+                          _buildBadge("G Pay", Colors.black87),
+                          const Spacer(),
+                          const Text("Encrypted", style: TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -283,7 +213,7 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
 
                     const SizedBox(height: 20),
 
-                    // ৫. কনফার্ম ও পে বাটন
+                    // ৫. পে বাটন
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -295,7 +225,7 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
                         ),
                         onPressed: () => _processOrder(total),
                         child: Text(
-                          "Place Order & Pay \$${total.toStringAsFixed(2)}",
+                          "Pay with Card / GPay  \$${total.toStringAsFixed(2)}",
                           style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -308,10 +238,17 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
     );
   }
 
+  Widget _buildBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
+      child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+    );
+  }
+
   Widget _buildSectionContainer({
     required String title,
     required IconData icon,
-    Widget? trailing,
     required Widget child,
   }) {
     return Container(
@@ -331,8 +268,6 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
               Icon(icon, color: AppTheme.primary, size: 20),
               const SizedBox(width: 8),
               Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              const Spacer(),
-              if (trailing != null) trailing,
             ],
           ),
           const Divider(height: 18),
@@ -349,12 +284,7 @@ class _NativeCheckoutScreenState extends State<NativeCheckoutScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
-            child: CachedNetworkImage(
-              imageUrl: image,
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
+            child: CachedNetworkImage(imageUrl: image, width: 50, height: 50, fit: BoxFit.cover),
           ),
           const SizedBox(width: 10),
           Expanded(
